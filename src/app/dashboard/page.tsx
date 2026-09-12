@@ -27,18 +27,18 @@ export default async function DashboardPage() {
       .eq("user_id", user.id)
       .eq("is_completed", false)
       .order("created_at", { ascending: false }),
-    supabase.from("profiles").select("current_xp").eq("id", user.id).single(),
+    supabase.from("profiles").select("current_xp").eq("id", user.id).maybeSingle(),
   ]);
 
   const { data: quests, error } = questsResult;
-  const currentXp = profileResult.data?.current_xp;
+  const currentXp = profileResult.data?.current_xp ?? 0;
 
   async function createQuest(formData: FormData) {
     "use server";
 
     const title = formData.get("title");
     if (typeof title !== "string" || !title.trim()) {
-      redirect("/dashboard");
+      return;
     }
 
     const serverSupabase = await createClient();
@@ -67,7 +67,7 @@ export default async function DashboardPage() {
 
     const questId = formData.get("questId");
     if (typeof questId !== "string" || !questId) {
-      redirect("/dashboard");
+      return;
     }
 
     const serverSupabase = await createClient();
@@ -91,15 +91,13 @@ export default async function DashboardPage() {
       throw new Error("Quest could not be completed.");
     }
 
-    const { data: profile, error: profileError } = await serverSupabase
+    const { data: profile } = await serverSupabase
       .from("profiles")
       .select("current_xp")
       .eq("id", actionUser.id)
-      .single();
+      .maybeSingle();
 
-    if (profileError || !profile) {
-      throw new Error("Profile could not be loaded.");
-    }
+    const currentXpVal = profile?.current_xp ?? 0;
 
     const { error: completeError } = await serverSupabase
       .from("quests")
@@ -114,8 +112,7 @@ export default async function DashboardPage() {
     const xpReward = quest.xp_reward ?? 25;
     const { error: xpError } = await serverSupabase
       .from("profiles")
-      .update({ current_xp: (profile.current_xp ?? 0) + xpReward })
-      .eq("id", actionUser.id);
+      .upsert({ id: actionUser.id, current_xp: currentXpVal + xpReward });
 
     if (xpError) {
       throw new Error("Quest completed, but XP could not be updated.");
@@ -143,7 +140,7 @@ export default async function DashboardPage() {
           <div className="flex items-center gap-4">
             <div className="border border-cyan-300/30 bg-cyan-300/10 px-4 py-2 text-right">
               <p className="font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-cyan-200/70">Current XP</p>
-              <p className="mt-1 font-mono text-xl font-black tracking-[0.08em] text-cyan-200">{currentXp ?? "--"}</p>
+              <p className="mt-1 font-mono text-xl font-black tracking-[0.08em] text-cyan-200">{currentXp}</p>
             </div>
             <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-cyan-200/70">
               <span className="h-2 w-2 animate-pulse rounded-full bg-lime-300 shadow-[0_0_10px_#bef264]" />
