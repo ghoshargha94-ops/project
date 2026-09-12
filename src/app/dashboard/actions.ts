@@ -4,7 +4,9 @@ import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 
-export async function generateQuest() {
+export type GenerateQuestState = { error?: string } | void;
+
+export async function generateQuest(): Promise<GenerateQuestState> {
   const cookieStore = await cookies();
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -23,7 +25,6 @@ export async function generateQuest() {
     return { error: "Unauthorized player." };
   }
 
-  // Pre-configured cyberpunk job titles pool
   const cyberTitles = [
     "Neural Net Infiltrator",
     "Synthetic Data Smuggler",
