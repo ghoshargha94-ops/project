@@ -1,7 +1,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
-import { GenerateQuestButton } from "./generate-quest-button";
+import GenerateQuestButton from "./generate-quest-button";
 
 type Quest = {
   id: string;
@@ -164,7 +164,7 @@ export default async function DashboardPage() {
               </p>
             ) : quests && quests.length > 0 ? (
               <ul className="space-y-3">
-                {(quests as Quest[]).map((quest) => (
+                {quests.map((quest) => (
                   <li key={quest.id} className="group flex items-center gap-4 border border-slate-700/70 bg-[#070a0f]/80 px-4 py-4 transition hover:border-cyan-300/50">
                     <span className="flex h-6 w-6 shrink-0 items-center justify-center border border-fuchsia-300/50 font-mono text-xs text-fuchsia-200">&gt;</span>
                     <span className="min-w-0 flex-1 break-words text-sm font-medium text-slate-100">{quest.title}</span>
