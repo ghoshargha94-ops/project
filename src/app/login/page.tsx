@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 
@@ -146,6 +147,15 @@ export default function LoginPage() {
               <span className="relative z-10">{isLoading ? "Connecting..." : isSignup ? "Start run" : "Enter the grid"}</span>
               <span className="absolute inset-y-0 -left-1/2 w-1/3 skew-x-[-20deg] bg-white/40 transition-all duration-700 group-hover:left-full" />
             </button>
+
+            {!isSignup && (
+              <Link
+                href="/forgot-password"
+                className="block text-center font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-fuchsia-300 transition hover:text-white"
+              >
+                Forgot password?
+              </Link>
+            )}
           </form>
 
           <p className="mt-7 text-center font-mono text-[10px] uppercase tracking-[0.16em] text-slate-600">
