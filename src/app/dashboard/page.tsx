@@ -7,6 +7,7 @@ import GenerateQuestButton from './generate-quest-button';
 import LogoutButton from './logout-button';
 import RoboticGuide from './robotic-guide';
 import QuestLog from './quest-log';
+import CyberSamuraiBackground from '@/components/cyber-samurai-background';
 
 export const revalidate = 0;
 
@@ -18,7 +19,7 @@ export default async function DashboardPage() {
   const { data: quests } = await supabase.from('quests').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
   const directives = quests ?? [];
 
-  return <div className="relative min-h-screen overflow-hidden bg-[#f7f7fa] px-5 py-6 text-slate-800 sm:px-8 lg:px-12">
+  return <CyberSamuraiBackground><div className="relative min-h-screen px-5 py-6 text-slate-800 sm:px-8 lg:px-12">
     <div className="mecha-grid pointer-events-none absolute inset-0 opacity-80" />
     <div className="pointer-events-none absolute inset-x-0 top-0 h-80 bg-[radial-gradient(ellipse_at_top,rgba(236,72,153,0.13),transparent_65%)]" />
     <header className="relative mx-auto flex max-w-7xl flex-col gap-6 border-b border-pink-200/80 pb-6 sm:flex-row sm:items-end sm:justify-between">
@@ -35,5 +36,5 @@ export default async function DashboardPage() {
       </section>
     </main>
     <RoboticGuide questCount={directives.length} />
-  </div>;
+  </div></CyberSamuraiBackground>;
 }

@@ -18,6 +18,12 @@ body {
   font-family: var(--font-sans);
 }
 
+html { scrollbar-color: #ec4899 #fff; scrollbar-width: thin; }
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: #fff; border-left: 1px solid #fce7f3; }
+::-webkit-scrollbar-thumb { background: linear-gradient(#f9a8d4, #ec4899); border: 2px solid #fff; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #db2777; }
+
 @keyframes rise-in {
   from {
     opacity: 0;
@@ -35,3 +41,4 @@ body {
 }
 .mecha-panel { clip-path: polygon(0 14px, 14px 0, calc(100% - 14px) 0, 100% 14px, 100% calc(100% - 14px), calc(100% - 14px) 100%, 14px 100%, 0 calc(100% - 14px)); }
 .mecha-button { clip-path: polygon(0 7px, 7px 0, calc(100% - 7px) 0, 100% 7px, 100% calc(100% - 7px), calc(100% - 7px) 100%, 7px 100%, 0 calc(100% - 7px)); }
+.shinobi-grid { background-image: linear-gradient(rgba(236, 72, 153, .08) 1px, transparent 1px), linear-gradient(90deg, rgba(236, 72, 153, .08) 1px, transparent 1px); background-size: 52px 52px; mask-image: linear-gradient(to bottom, black, transparent 85%); }

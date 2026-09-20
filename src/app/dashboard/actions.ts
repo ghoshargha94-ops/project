@@ -90,7 +90,6 @@ export async function generateQuest(): Promise<GenerateQuestState> {
       title: template.title,
       rarity: template.rarity,
       reward_credits,
-      user_id: user.id,
     })
     .select('id, title, rarity, reward_credits')
     .single();

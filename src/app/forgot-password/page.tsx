@@ -3,6 +3,8 @@
 import { FormEvent, useState } from 'react';
 import Link from 'next/link';
 import { createBrowserClient } from '@supabase/ssr';
+import CyberSamuraiBackground from '@/components/cyber-samurai-background';
+import CyberShinobi from '@/components/cyber-shinobi';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -21,7 +23,7 @@ export default function ForgotPasswordPage() {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
+      redirectTo: `${window.location.origin}/auth/callback?next=/reset-password`,
     });
 
     setIsLoading(false);
@@ -35,9 +37,7 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#f7f7fa] px-5 py-10 text-slate-800">
-      <div className="mecha-grid pointer-events-none absolute inset-0 opacity-70" />
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-80 bg-[radial-gradient(ellipse_at_top,rgba(236,72,153,0.15),transparent_65%)]" />
+    <CyberSamuraiBackground><main className="relative flex min-h-screen items-center justify-center gap-10 px-5 py-10 text-slate-800">
 
       <section className="relative w-full max-w-md rounded-sm border border-slate-200 bg-white p-7 font-mono shadow-[0_16px_45px_rgba(71,85,105,0.12)] sm:p-9">
         <div className="mb-8 border-b border-pink-100 pb-5">
@@ -79,7 +79,7 @@ export default function ForgotPasswordPage() {
         <Link href="/login" className="mt-6 block text-center text-[10px] font-bold uppercase tracking-[0.16em] text-pink-500 transition hover:text-pink-700">
           Return to login
         </Link>
-      </section>
-    </main>
+      </section><CyberShinobi mood={isLoading ? 'loading' : message ? 'success' : email ? 'typing' : 'idle'} />
+    </main></CyberSamuraiBackground>
   );
 }

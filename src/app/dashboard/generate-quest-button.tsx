@@ -3,6 +3,7 @@
 import { FormEvent, useState } from 'react';
 import { createBrowserClient } from '@supabase/ssr';
 import { useRouter } from 'next/navigation';
+import SkillTree from './skill-tree';
 
 const GENERATED_MISSIONS = [
   'Hydration Protocol: Consume 500ml of water.',
@@ -19,6 +20,8 @@ export default function DirectiveConsole() {
   const [objective, setObjective] = useState('');
   const [status, setStatus] = useState<DeploymentStatus>('idle');
   const [message, setMessage] = useState('');
+  const [subquests, setSubquests] = useState<string[]>([]);
+  const [treeObjective, setTreeObjective] = useState('');
   const router = useRouter();
 
   const supabase = createBrowserClient(
@@ -43,6 +46,12 @@ export default function DirectiveConsole() {
     setStatus('success');
     setMessage(`Directive deployed: ${objective}`);
     setObjective('');
+    const skillResponse = await fetch('/api/subquests', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ objective }) });
+    const skillData = await skillResponse.json().catch(() => null);
+    if (skillResponse.ok && Array.isArray(skillData?.subquests)) {
+      setTreeObjective(objective);
+      setSubquests(skillData.subquests);
+    }
     router.refresh();
   };
 
@@ -163,6 +172,8 @@ export default function DirectiveConsole() {
           {status === 'error' ? `Sync error: ${message}` : message}
         </div>
       )}
+
+      {subquests.length > 0 && <SkillTree objective={treeObjective} subquests={subquests} />}
 
       <aside className="relative mt-5 flex gap-3 rounded-sm border border-pink-100 bg-pink-50/70 p-3" aria-label="Action figure guide">
         <div className="grid h-9 w-9 shrink-0 place-items-center rounded-sm bg-slate-900 text-pink-400 shadow-sm" aria-hidden="true">

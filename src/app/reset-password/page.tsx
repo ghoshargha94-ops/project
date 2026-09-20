@@ -3,6 +3,8 @@
 import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createBrowserClient } from '@supabase/ssr';
+import CyberSamuraiBackground from '@/components/cyber-samurai-background';
+import CyberShinobi from '@/components/cyber-shinobi';
 
 export default function ResetPasswordPage() {
   const [newPassword, setNewPassword] = useState('');
@@ -39,9 +41,7 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#f7f7fa] px-5 py-10 text-slate-800">
-      <div className="mecha-grid pointer-events-none absolute inset-0 opacity-70" />
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-80 bg-[radial-gradient(ellipse_at_top,rgba(236,72,153,0.15),transparent_65%)]" />
+    <CyberSamuraiBackground><main className="relative flex min-h-screen items-center justify-center gap-10 px-5 py-10 text-slate-800">
 
       <section className="relative w-full max-w-md rounded-sm border border-slate-200 bg-white p-7 font-mono shadow-[0_16px_45px_rgba(71,85,105,0.12)] sm:p-9">
         <div className="mb-8 border-b border-pink-100 pb-5">
@@ -92,7 +92,7 @@ export default function ResetPasswordPage() {
             </button>
           </form>
         )}
-      </section>
-    </main>
+      </section><CyberShinobi mood={isLoading ? 'loading' : isComplete ? 'success' : newPassword ? 'typing' : 'idle'} />
+    </main></CyberSamuraiBackground>
   );
 }

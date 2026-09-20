@@ -4,6 +4,8 @@ import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
+import CyberSamuraiBackground from "@/components/cyber-samurai-background";
+import CyberShinobi from "@/components/cyber-shinobi";
 
 type Mode = "login" | "signup";
 
@@ -52,10 +54,7 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="relative isolate flex min-h-screen items-center justify-center overflow-hidden bg-[#070a0f] px-5 py-10 text-slate-100">
-      <div className="cyber-grid pointer-events-none absolute inset-0 opacity-60" />
-      <div className="pointer-events-none absolute -left-40 top-1/4 h-80 w-80 rounded-full bg-cyan-400/10 blur-3xl" />
-      <div className="pointer-events-none absolute -right-40 bottom-1/4 h-80 w-80 rounded-full bg-fuchsia-500/10 blur-3xl" />
+    <CyberSamuraiBackground><main className="relative isolate flex min-h-screen items-center justify-center gap-10 px-5 py-10 text-slate-100">
 
       <section className="relative w-full max-w-md animate-[rise-in_700ms_ease-out_both]">
         <div className="mb-8 flex items-center justify-between text-[10px] font-bold uppercase tracking-[0.34em] text-cyan-300/70">
@@ -163,6 +162,7 @@ export default function LoginPage() {
           </p>
         </div>
       </section>
-    </main>
+      <CyberShinobi mood={isLoading ? 'loading' : message ? 'success' : email || password ? 'typing' : 'idle'} />
+    </main></CyberSamuraiBackground>
   );
 }
