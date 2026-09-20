@@ -3,13 +3,6 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import GenerateQuestButton from "./generate-quest-button";
 
-type Quest = {
-  id: string;
-  title: string;
-  created_at: string;
-  xp_reward: number | null;
-};
-
 export default async function DashboardPage() {
   const supabase = await createClient();
   const {
