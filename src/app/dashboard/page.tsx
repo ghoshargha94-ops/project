@@ -1,10 +1,11 @@
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { Activity, CircleDot, Command, Radar, Sparkles } from 'lucide-react';
+import { Activity, Command, Radar, Sparkles } from 'lucide-react';
 import AboutProject from './about-project';
 import GenerateQuestButton from './generate-quest-button';
 import RoboticGuide from './robotic-guide';
+import QuestLog from './quest-log';
 
 export const revalidate = 0;
 
@@ -26,7 +27,7 @@ export default async function DashboardPage() {
     <main className="relative mx-auto mt-8 grid max-w-7xl grid-cols-1 gap-6 lg:grid-cols-12">
       <section className="mecha-panel lg:col-span-4 h-fit border border-slate-200 bg-white/65 p-6 shadow-[0_16px_45px_rgba(71,85,105,0.08)] backdrop-blur-md"><div className="mb-6 flex items-center justify-between"><div><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-pink-500">Directive console</p><h2 className="mt-1 text-xl font-black uppercase tracking-tight">Deploy a mission</h2></div><Command className="text-pink-400" size={23} /></div><GenerateQuestButton /></section>
       <section className="mecha-panel lg:col-span-8 min-h-[520px] border border-slate-200 bg-white/65 p-6 shadow-[0_16px_45px_rgba(71,85,105,0.08)] backdrop-blur-md sm:p-7"><div className="mb-6 flex items-start justify-between"><div><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-pink-500">Active systems</p><h2 className="mt-1 text-xl font-black uppercase tracking-tight">Quest log</h2></div><div className="flex items-center gap-2 border border-pink-200 bg-pink-50 px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-wider text-pink-600"><Activity size={13} /> {directives.length} synced</div></div>
-        {directives.length ? <ul className="space-y-3">{directives.map(quest => <li key={quest.id} className="group relative flex flex-col gap-3 border border-slate-200 bg-white/80 p-4 transition hover:-translate-y-0.5 hover:border-pink-400 hover:shadow-[0_8px_22px_rgba(236,72,153,0.12)] sm:flex-row sm:items-center sm:justify-between"><span className="absolute bottom-0 left-0 top-0 w-1 bg-gradient-to-b from-pink-400 to-pink-600" /><div className="flex min-w-0 items-center gap-3 pl-2"><CircleDot size={17} className="shrink-0 text-pink-500" /><span className="truncate font-semibold text-slate-700">{quest.title}</span></div><div className="flex shrink-0 items-center gap-3 pl-2 sm:pl-0">{quest.rarity && <span className="border border-pink-100 bg-pink-50 px-2 py-1 font-mono text-[9px] font-bold uppercase tracking-widest text-pink-500">{quest.rarity}</span>}<span className="font-mono text-[10px] text-slate-400">{quest.created_at ? new Date(quest.created_at).toLocaleDateString() : 'NEW'}</span></div></li>)}</ul> : <div className="grid min-h-72 place-items-center border border-dashed border-pink-200 bg-white/40 p-8 text-center"><div><Radar size={42} className="mx-auto text-pink-300" /><h3 className="mt-4 font-bold uppercase tracking-wide text-slate-700">No directives detected</h3><p className="mt-2 max-w-xs text-sm leading-6 text-slate-500">Your command deck is clear. Create a goal or generate a mission to begin your next run.</p><Sparkles size={15} className="mx-auto mt-4 text-pink-400" /></div></div>}
+        {directives.length ? <QuestLog quests={directives} /> : <div className="grid min-h-72 place-items-center border border-dashed border-pink-200 bg-white/40 p-8 text-center"><div><Radar size={42} className="mx-auto text-pink-300" /><h3 className="mt-4 font-bold uppercase tracking-wide text-slate-700">No directives detected</h3><p className="mt-2 max-w-xs text-sm leading-6 text-slate-500">Your command deck is clear. Create a goal or generate a mission to begin your next run.</p><Sparkles size={15} className="mx-auto mt-4 text-pink-400" /></div></div>}
       </section>
     </main>
     <RoboticGuide questCount={directives.length} />
