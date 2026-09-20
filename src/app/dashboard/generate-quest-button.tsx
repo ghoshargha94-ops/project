@@ -1,49 +1,75 @@
 'use client';
-
-import { useActionState } from 'react';
-import { generateQuest, GenerateQuestState } from './actions';
-
-const RARITY_STYLES: Record<string, string> = {
-  common: 'text-zinc-300 border-zinc-600',
-  uncommon: 'text-green-400 border-green-600',
-  rare: 'text-blue-400 border-blue-600',
-  legendary: 'text-amber-400 border-amber-500',
-};
+import { useState } from 'react';
+import { createBrowserClient } from '@supabase/ssr';
+import { useRouter } from 'next/navigation';
 
 export default function GenerateQuestButton() {
-  const [state, formAction, isPending] = useActionState<GenerateQuestState | null>(
-    generateQuest,
-    null
+  const [objective, setObjective] = useState('');
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const router = useRouter();
+
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
+  const deployQuest = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!objective.trim()) return;
+    
+    setStatus('loading');
+
+    // Securely fetch the current user
+    const { data: { user } } = await supabase.auth.getUser();
+
+    // Push the custom text AND the user ID to Supabase
+    const { error } = await supabase
+      .from('quests')
+      .insert([{ 
+        title: objective, 
+        user_id: user?.id 
+      }]);
+
+    if (error) {
+      console.error(error);
+      setStatus('error');
+    } else {
+      setStatus('success');
+      setObjective('');
+      router.refresh(); 
+      setTimeout(() => setStatus('idle'), 2000);
+    }
+  };
+
   return (
-    <form action={formAction} className="flex flex-col items-start gap-3">
+    <form onSubmit={deployQuest} className="flex flex-col gap-4">
+      <div className="flex flex-col gap-2">
+        <label htmlFor="objective" className="text-xs text-cyan-600 uppercase tracking-widest font-bold">
+          Quest Objective
+        </label>
+        <input
+          id="objective"
+          type="text"
+          value={objective}
+          onChange={(e) => setObjective(e.target.value)}
+          placeholder="Enter custom directive..."
+          className="w-full bg-black border border-cyan-800 text-cyan-100 p-3 outline-none focus:border-fuchsia-500 focus:ring-1 focus:ring-fuchsia-500 transition-all placeholder:text-cyan-900"
+          disabled={status === 'loading'}
+        />
+      </div>
+
       <button
         type="submit"
-        disabled={isPending}
-        className="px-4 py-2 bg-cyan-500 text-black font-bold rounded hover:bg-cyan-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        disabled={status === 'loading' || !objective.trim()}
+        className="w-full py-3 px-4 border border-cyan-500 bg-cyan-950/30 text-cyan-400 uppercase tracking-widest font-bold hover:bg-cyan-900/50 hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {isPending ? 'Generating Quest...' : 'Generate New Quest'}
+        {status === 'loading' ? 'Transmitting...' : 'Deploy Quest'}
       </button>
 
-      {state?.error && (
-        <p role="alert" className="text-red-500 text-sm">
-          {state.error}
+      {status === 'error' && (
+        <p className="text-red-500 text-xs mt-2 uppercase tracking-widest animate-pulse border border-red-900 bg-red-950/20 p-2">
+          Critical Error: Directive failed to store.
         </p>
-      )}
-
-      {state?.quest && (
-        <div
-          className={`w-full max-w-sm rounded border bg-zinc-900 p-3 ${
-            RARITY_STYLES[state.quest.rarity] ?? RARITY_STYLES.common
-          }`}
-        >
-          <p className="font-bold">{state.quest.title}</p>
-          <div className="flex justify-between text-xs mt-1 opacity-80">
-            <span className="uppercase tracking-wide">{state.quest.rarity}</span>
-            <span>{state.quest.reward_credits} credits</span>
-          </div>
-        </div>
       )}
     </form>
   );
