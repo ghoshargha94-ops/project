@@ -31,27 +31,19 @@ export default function DirectiveConsole() {
 
   const deployManualQuest = async (objective: string) => {
     setStatus('loading');
-    setMessage('Establishing secure uplink…');
-
-    // user_id is intentionally omitted: the database assigns auth.uid() automatically.
-    const { error } = await supabase.from('quests').insert([{ title: objective }]);
-
-    if (error) {
-      console.error('Supabase quest insert error:', error);
+    setMessage('Life Engine is forging your skill tree…');
+    const response = await fetch('/api/quests/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ objective }) });
+    const data = await response.json().catch(() => null);
+    if (!response.ok) {
       setStatus('error');
-      setMessage(error.message);
+      setMessage(data?.error ?? 'Directive failed to store.');
       return;
     }
-
     setStatus('success');
-    setMessage(`Directive deployed: ${objective}`);
+    setMessage(data.briefing);
     setObjective('');
-    const skillResponse = await fetch('/api/subquests', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ objective }) });
-    const skillData = await skillResponse.json().catch(() => null);
-    if (skillResponse.ok && Array.isArray(skillData?.subquests)) {
-      setTreeObjective(objective);
-      setSubquests(skillData.subquests);
-    }
+    setTreeObjective(objective);
+    setSubquests(data.nodes?.map((node: { title: string }) => node.title) ?? []);
     router.refresh();
   };
 

@@ -7,6 +7,7 @@ import GenerateQuestButton from './generate-quest-button';
 import LogoutButton from './logout-button';
 import RoboticGuide from './robotic-guide';
 import QuestLog from './quest-log';
+import DashboardHologram from './dashboard-hologram';
 import CyberSamuraiBackground from '@/components/cyber-samurai-background';
 
 export const revalidate = 0;
@@ -30,7 +31,7 @@ export default async function DashboardPage() {
       </div>
     </header>
     <main className="relative mx-auto mt-8 grid max-w-7xl grid-cols-1 gap-6 lg:grid-cols-12">
-      <section className="mecha-panel lg:col-span-4 h-fit border border-slate-200 bg-white/65 p-6 shadow-[0_16px_45px_rgba(71,85,105,0.08)] backdrop-blur-md"><div className="mb-6 flex items-center justify-between"><div><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-pink-500">Directive console</p><h2 className="mt-1 text-xl font-black uppercase tracking-tight">Deploy a mission</h2></div><Command className="text-pink-400" size={23} /></div><GenerateQuestButton /></section>
+      <section className="mecha-panel lg:col-span-4 h-fit border border-slate-200 bg-white/65 p-6 shadow-[0_16px_45px_rgba(71,85,105,0.08)] backdrop-blur-md"><div className="mb-6 flex items-center justify-between"><div><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-pink-500">Directive console</p><h2 className="mt-1 text-xl font-black uppercase tracking-tight">Deploy a mission</h2></div><Command className="text-pink-400" size={23} /></div><DashboardHologram /><div className="mt-5"><GenerateQuestButton /></div></section>
       <section className="mecha-panel lg:col-span-8 min-h-[520px] border border-slate-200 bg-white/65 p-6 shadow-[0_16px_45px_rgba(71,85,105,0.08)] backdrop-blur-md sm:p-7"><div className="mb-6 flex items-start justify-between"><div><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-pink-500">Active systems</p><h2 className="mt-1 text-xl font-black uppercase tracking-tight">Quest log</h2></div><div className="flex items-center gap-2 border border-pink-200 bg-pink-50 px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-wider text-pink-600"><Activity size={13} /> {directives.length} synced</div></div>
         {directives.length ? <QuestLog quests={directives} /> : <div className="grid min-h-72 place-items-center border border-dashed border-pink-200 bg-white/40 p-8 text-center"><div><Radar size={42} className="mx-auto text-pink-300" /><h3 className="mt-4 font-bold uppercase tracking-wide text-slate-700">No directives detected</h3><p className="mt-2 max-w-xs text-sm leading-6 text-slate-500">Your command deck is clear. Create a goal or generate a mission to begin your next run.</p><Sparkles size={15} className="mx-auto mt-4 text-pink-400" /></div></div>}
       </section>
