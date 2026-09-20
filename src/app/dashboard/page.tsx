@@ -1,84 +1,34 @@
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { Activity, CircleDot, Command, Radar, Sparkles } from 'lucide-react';
+import AboutProject from './about-project';
 import GenerateQuestButton from './generate-quest-button';
+import RoboticGuide from './robotic-guide';
 
 export const revalidate = 0;
 
 export default async function DashboardPage() {
   const cookieStore = await cookies();
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { cookies: { getAll: () => cookieStore.getAll() } }
-  );
-
+  const supabase = createServerClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, { cookies: { getAll: () => cookieStore.getAll() } });
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError || !user) redirect('/');
+  const { data: quests } = await supabase.from('quests').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
+  const directives = quests ?? [];
 
-  const { data: quests } = await supabase
-    .from('quests')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false });
-
-  return (
-    <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-[#050505] to-black text-cyan-500 p-8 font-mono tracking-wide overflow-hidden relative">
-      {/* Decorative Grid Background */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(6,182,212,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(6,182,212,0.03)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
-
-      <header className="relative z-10 mb-12 border-b border-cyan-900/50 pb-6 flex justify-between items-end">
-        <div>
-          <h1 className="text-5xl font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-fuchsia-500 drop-shadow-[0_0_15px_rgba(6,182,212,0.5)] uppercase">
-            System Online
-          </h1>
-          <p className="text-xs text-cyan-700 mt-3 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-            Operator ID: {user.email}
-          </p>
-        </div>
-      </header>
-      
-      <main className="relative z-10 max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
-        
-        {/* Command Center */}
-        <section className="lg:col-span-4 bg-black/40 backdrop-blur-md border border-cyan-800/50 p-6 rounded-sm shadow-[0_0_30px_rgba(6,182,212,0.05)] h-fit">
-          <h2 className="text-xl font-bold mb-6 text-white uppercase tracking-widest flex items-center gap-2">
-            <span className="text-fuchsia-500">_</span>New Directive
-          </h2>
-          <GenerateQuestButton />
-        </section>
-
-        {/* Active Quest Log */}
-        <section className="lg:col-span-8 bg-black/40 backdrop-blur-md border border-cyan-800/50 p-6 rounded-sm shadow-[0_0_30px_rgba(6,182,212,0.05)] min-h-[500px]">
-          <h2 className="text-xl font-bold mb-6 text-white uppercase tracking-widest flex items-center gap-2">
-            <span className="text-cyan-500">_</span>Live Quest Log
-          </h2>
-          
-          {quests && quests.length > 0 ? (
-            <ul className="space-y-4">
-              {quests.map((quest) => (
-                <li 
-                  key={quest.id} 
-                  className="group relative p-5 bg-[#0a0a0a]/80 border-l-4 border-cyan-600 flex justify-between items-center transition-all duration-300 hover:border-fuchsia-500 hover:bg-[#111] hover:shadow-[inset_0_0_20px_rgba(6,182,212,0.1)]"
-                >
-                  <span className="text-cyan-50 font-medium text-lg drop-shadow-[0_0_5px_rgba(255,255,255,0.2)]">
-                    {quest.title}
-                  </span>
-                  <span className="text-xs text-cyan-800 group-hover:text-cyan-400 transition-colors">
-                    {new Date(quest.created_at).toLocaleDateString()}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <div className="flex flex-col items-center justify-center h-64 border border-dashed border-cyan-900/50 bg-black/20">
-              <span className="text-cyan-700/50 text-4xl mb-4">ø</span>
-              <p className="text-cyan-700 text-sm tracking-widest uppercase">No active directives found.</p>
-            </div>
-          )}
-        </section>
-      </main>
-    </div>
-  );
+  return <div className="relative min-h-screen overflow-hidden bg-[#f7f7fa] px-5 py-6 text-slate-800 sm:px-8 lg:px-12">
+    <div className="mecha-grid pointer-events-none absolute inset-0 opacity-80" />
+    <div className="pointer-events-none absolute inset-x-0 top-0 h-80 bg-[radial-gradient(ellipse_at_top,rgba(236,72,153,0.13),transparent_65%)]" />
+    <header className="relative mx-auto flex max-w-7xl flex-col gap-6 border-b border-pink-200/80 pb-6 sm:flex-row sm:items-end sm:justify-between">
+      <div><div className="mb-3 flex items-center gap-2 font-mono text-[10px] font-bold uppercase tracking-[0.25em] text-pink-500"><span className="h-2 w-2 bg-pink-500 shadow-[0_0_10px_#ec4899]" />Operator interface / v.01</div><h1 className="text-4xl font-black uppercase tracking-tight text-slate-800 sm:text-5xl">Life <span className="text-pink-500 drop-shadow-[0_0_12px_rgba(236,72,153,0.35)]">RPG</span></h1><p className="mt-2 text-sm text-slate-500">Command deck online · {user.email}</p></div>
+      <AboutProject />
+    </header>
+    <main className="relative mx-auto mt-8 grid max-w-7xl grid-cols-1 gap-6 lg:grid-cols-12">
+      <section className="mecha-panel lg:col-span-4 h-fit border border-slate-200 bg-white/65 p-6 shadow-[0_16px_45px_rgba(71,85,105,0.08)] backdrop-blur-md"><div className="mb-6 flex items-center justify-between"><div><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-pink-500">Directive console</p><h2 className="mt-1 text-xl font-black uppercase tracking-tight">Deploy a mission</h2></div><Command className="text-pink-400" size={23} /></div><GenerateQuestButton /></section>
+      <section className="mecha-panel lg:col-span-8 min-h-[520px] border border-slate-200 bg-white/65 p-6 shadow-[0_16px_45px_rgba(71,85,105,0.08)] backdrop-blur-md sm:p-7"><div className="mb-6 flex items-start justify-between"><div><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-pink-500">Active systems</p><h2 className="mt-1 text-xl font-black uppercase tracking-tight">Quest log</h2></div><div className="flex items-center gap-2 border border-pink-200 bg-pink-50 px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-wider text-pink-600"><Activity size={13} /> {directives.length} synced</div></div>
+        {directives.length ? <ul className="space-y-3">{directives.map(quest => <li key={quest.id} className="group relative flex flex-col gap-3 border border-slate-200 bg-white/80 p-4 transition hover:-translate-y-0.5 hover:border-pink-400 hover:shadow-[0_8px_22px_rgba(236,72,153,0.12)] sm:flex-row sm:items-center sm:justify-between"><span className="absolute bottom-0 left-0 top-0 w-1 bg-gradient-to-b from-pink-400 to-pink-600" /><div className="flex min-w-0 items-center gap-3 pl-2"><CircleDot size={17} className="shrink-0 text-pink-500" /><span className="truncate font-semibold text-slate-700">{quest.title}</span></div><div className="flex shrink-0 items-center gap-3 pl-2 sm:pl-0">{quest.rarity && <span className="border border-pink-100 bg-pink-50 px-2 py-1 font-mono text-[9px] font-bold uppercase tracking-widest text-pink-500">{quest.rarity}</span>}<span className="font-mono text-[10px] text-slate-400">{quest.created_at ? new Date(quest.created_at).toLocaleDateString() : 'NEW'}</span></div></li>)}</ul> : <div className="grid min-h-72 place-items-center border border-dashed border-pink-200 bg-white/40 p-8 text-center"><div><Radar size={42} className="mx-auto text-pink-300" /><h3 className="mt-4 font-bold uppercase tracking-wide text-slate-700">No directives detected</h3><p className="mt-2 max-w-xs text-sm leading-6 text-slate-500">Your command deck is clear. Create a goal or generate a mission to begin your next run.</p><Sparkles size={15} className="mx-auto mt-4 text-pink-400" /></div></div>}
+      </section>
+    </main>
+    <RoboticGuide questCount={directives.length} />
+  </div>;
 }
