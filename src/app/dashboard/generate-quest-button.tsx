@@ -26,7 +26,7 @@ export default function DirectiveConsole() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
-  const deployDirective = async (objective: string) => {
+  const deployManualQuest = async (objective: string) => {
     setStatus('loading');
     setMessage('Establishing secure uplink…');
 
@@ -51,16 +51,33 @@ export default function DirectiveConsole() {
     const trimmedObjective = objective.trim();
 
     if (!trimmedObjective || status === 'loading') return;
-    await deployDirective(trimmedObjective);
+    await deployManualQuest(trimmedObjective);
   };
 
-  const handleGeneratedDeployment = async () => {
+  const deployGeneratedQuest = async () => {
     if (status === 'loading') return;
 
-    const objective =
+    const selectedMission =
       GENERATED_MISSIONS[Math.floor(Math.random() * GENERATED_MISSIONS.length)];
-    await deployDirective(objective);
+    setStatus('loading');
+    setMessage('Establishing secure uplink…');
+
+    // user_id is intentionally omitted: the database assigns auth.uid() automatically.
+    const { error } = await supabase.from('quests').insert([{ title: selectedMission }]);
+
+    if (error) {
+      console.error('Supabase quest insert error:', error);
+      setStatus('error');
+      setMessage(error.message);
+      return;
+    }
+
+    setStatus('success');
+    setMessage(`Directive deployed: ${selectedMission}`);
+    router.refresh();
   };
+
+  const handleGeneratedDeployment = async () => deployGeneratedQuest();
 
   const isLoading = status === 'loading';
 
